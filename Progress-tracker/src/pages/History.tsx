@@ -1,56 +1,70 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function History() {
   const [deletedEntries, setDeletedEntries] = useState<string[]>([]);
-  const [entries, setEntries] = useState<string[]>([]);
+  const [showConfirm, setShowConfirm] = useState(false); 
 
   useEffect(() => {
-    const savedDeleted = localStorage.getItem("deletedProgress");
-    if (savedDeleted) {
-      setDeletedEntries(JSON.parse(savedDeleted));
-    }
-
-    const savedEntries = localStorage.getItem("progress");
-    if (savedEntries) {
-      setEntries(JSON.parse(savedEntries));
+    const savedDeletedEntries = localStorage.getItem("deleted");
+    if (savedDeletedEntries) {
+      setDeletedEntries(JSON.parse(savedDeletedEntries));
     }
   }, []);
 
   const restoreEntry = (index: number) => {
-    const entryToRestore = deletedEntries[index];
-    const updatedDeletedEntries = deletedEntries.filter((_, i) => i !== index);
-    
-    setEntries([entryToRestore, ...entries]);
-    setDeletedEntries(updatedDeletedEntries);
+    const restoredItem = deletedEntries[index];
 
-    localStorage.setItem("progress", JSON.stringify([entryToRestore, ...entries]));
-    localStorage.setItem("deletedProgress", JSON.stringify(updatedDeletedEntries));
+    const updatedDeletedEntries = deletedEntries.filter((_, i) => i !== index);
+    setDeletedEntries(updatedDeletedEntries);
+    localStorage.setItem("deleted", JSON.stringify(updatedDeletedEntries));
+
+    const progressEntries = JSON.parse(localStorage.getItem("progress") || "[]");
+    progressEntries.push(restoredItem);
+    localStorage.setItem("progress", JSON.stringify(progressEntries));
   };
 
   const clearHistory = () => {
-    setDeletedEntries([]); 
-    localStorage.removeItem("deletedProgress"); 
+    setShowConfirm(true); 
+  };
+
+  const confirmClearHistory = () => {
+    setDeletedEntries([]);
+    localStorage.removeItem("deleted");
+    setShowConfirm(false); 
   };
 
   return (
     <div>
-      <h1>История удалённых записей</h1>
-      {deletedEntries.length === 0 ? (
-        <p>Нет удалённых записей.</p>
-      ) : (
-        <>
-          <button className="clear-history" onClick={clearHistory}>
-            🗑 Очистить Историю
-          </button>
-          <ul>
-  {deletedEntries.map((entry, index) => (
-    <li key={index}>
-      {entry}
-      <button className="restore" onClick={() => restoreEntry(index)}>♻️ Восстановить</button>
-    </li>
-  ))}
-</ul>
-        </>
+      <h2>🗑 История удалённых</h2>
+
+      <motion.ul layout>
+        <AnimatePresence>
+          {deletedEntries.map((entry, index) => (
+            <motion.li
+              key={index}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {entry}
+              <button className="restore" onClick={() => restoreEntry(index)}>♻️ Восстановить</button>
+            </motion.li>
+          ))}
+        </AnimatePresence>
+      </motion.ul>
+
+      {deletedEntries.length > 0 && (
+        <button className="clear-history" onClick={clearHistory}>🗑 Очистить историю</button>
+      )}
+
+      {showConfirm && (
+        <div className="modal">
+          <p>Вы уверены, что хотите очистить историю?</p>
+          <button onClick={confirmClearHistory}>✅ Да, очистить</button>
+          <button onClick={() => setShowConfirm(false)}>❌ Отмена</button>
+        </div>
       )}
     </div>
   );

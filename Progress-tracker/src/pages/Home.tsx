@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; 
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
@@ -6,6 +6,14 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [category, setCategory] = useState("Общее");
   const [filter, setFilter] = useState("Все");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus(); 
+    }
+  }, []);
 
   useEffect(() => {
     const savedEntries = localStorage.getItem("progress");
@@ -20,7 +28,11 @@ export default function Home() {
     const updatedEntries = [newEntry, ...entries];
     setEntries(updatedEntries);
     localStorage.setItem("progress", JSON.stringify(updatedEntries));
-    setInput("");
+    setInput(""); 
+
+    if (inputRef.current) {
+      inputRef.current.focus(); 
+    }
   };
 
   const deleteEntry = (index: number) => {
@@ -43,17 +55,37 @@ export default function Home() {
   }, {} as Record<string, number>);
 
   return (
-    <div>
-      <h1>📌 Progress Tracker</h1>
+    <div className="container">  
 
-      <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Добавить запись..." />
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
-        <option>Общее</option>
-        <option>Учёба</option>
-        <option>Работа</option>
-        <option>Личное</option>
-      </select>
-      <button onClick={addEntry}>➕ Добавить</button>
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}  
+          animate={{ opacity: 1, y: 0 }}  
+          transition={{ duration: 0.8 }}  
+        >
+          📌 Progress Tracker
+        </motion.h1>
+
+      <div className="input-container">
+        <input
+          ref={inputRef} 
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Добавить запись..."
+        />
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option>Общее</option>
+          <option>Учёба</option>
+          <option>Работа</option>
+          <option>Личное</option>
+        </select>
+        <motion.button
+          onClick={addEntry}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}  >
+          ➕ Добавить
+        </motion.button>
+      </div>
 
       <div className="filter-section">
         <label>Фильтр:</label>
@@ -71,13 +103,22 @@ export default function Home() {
           {filteredEntries.map((entry, index) => (
             <motion.li
               key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.9 }}
               transition={{ duration: 0.3 }}
             >
               <strong>[{entry.category}]</strong> {entry.text}
-              <button className="delete" onClick={() => deleteEntry(index)}>❌</button>
+              <motion.button
+                className="delete"
+                onClick={() => deleteEntry(index)}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.2 }}
+              >
+                ❌
+              </motion.button>
+
             </motion.li>
           ))}
         </AnimatePresence>

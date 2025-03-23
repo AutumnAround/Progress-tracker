@@ -7,11 +7,9 @@ export default function Home() {
   const [category, setCategory] = useState("Общее");
   const [filter, setFilter] = useState("Все");
 
-  // 🔹 Состояния для редактирования
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editText, setEditText] = useState<string>("");
 
-  // 🔹 Состояния для Undo (Отмена удаления)
   const [deletedEntry, setDeletedEntry] = useState<{ text: string; category: string } | null>(null);
   const [deletedIndex, setDeletedIndex] = useState<number | null>(null);
 
@@ -30,39 +28,39 @@ export default function Home() {
     }
   }, []);
 
-  // 🔹 Добавление записи
   const addEntry = () => {
     if (input.trim() === "") return;
+  
     const newEntry = { text: input, category };
-    const updatedEntries = [newEntry, ...entries];
-    setEntries(updatedEntries);
-    localStorage.setItem("progress", JSON.stringify(updatedEntries));
-    setInput("");
-
-    if (inputRef.current) {
-      inputRef.current.focus();
+  
+    if (editIndex !== null) {
+      const updated = [...entries];
+      updated[editIndex] = newEntry;
+      setEntries(updated);
+      localStorage.setItem("progress", JSON.stringify(updated));
+      setEditIndex(null); // Сбрасываем
+    } else {
+      const updated = [newEntry, ...entries];
+      setEntries(updated);
+      localStorage.setItem("progress", JSON.stringify(updated));
     }
-
-    // При добавлении новой записи, сбрасываем Undo
-    setDeletedEntry(null);
-    setDeletedIndex(null);
+  
+    setInput(""); 
+    if (inputRef.current) inputRef.current.focus();
   };
+  
 
-  // 🔹 Удаление записи (сохранение для Undo)
   const deleteEntry = (index: number) => {
     const entryToDelete = entries[index];
 
-    // Убираем запись из списка
     const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries);
     localStorage.setItem("progress", JSON.stringify(updatedEntries));
 
-    // Сохраняем удалённую запись временно
     setDeletedEntry(entryToDelete);
     setDeletedIndex(index);
   };
 
-  // 🔹 Отмена удаления (возвращение записи)
   const undoDelete = () => {
     if (deletedEntry && deletedIndex !== null) {
       const updatedEntries = [...entries];
@@ -71,12 +69,10 @@ export default function Home() {
       localStorage.setItem("progress", JSON.stringify(updatedEntries));
     }
 
-    // Очищаем временные данные
     setDeletedEntry(null);
     setDeletedIndex(null);
   };
 
-  // 🔹 Редактирование записей
   const startEdit = (index: number, text: string) => {
     setEditIndex(index);
     setEditText(text);
@@ -103,6 +99,11 @@ export default function Home() {
       <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
         📌 Progress Tracker
       </motion.h1>
+      {editIndex !== null && (
+          <div className="edit-indicator">
+            ✏️ <strong>Редактирование записи #{editIndex + 1}</strong>
+          </div>
+        )}
 
       <div className="input-container">
         <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Добавить запись..." />
@@ -128,7 +129,6 @@ export default function Home() {
         </select>
       </div>
 
-      {/* 🔹 Кнопка "Отмена удаления" */}
       {deletedEntry && (
         <motion.div 
           className="undo-container"
@@ -167,6 +167,17 @@ export default function Home() {
                   <strong>[{entry.category}]</strong> {entry.text}
                   <motion.button className="edit" onClick={() => startEdit(index, entry.text)}>✏</motion.button>
                   <motion.button className="delete" onClick={() => deleteEntry(index)}>❌</motion.button>
+                  <motion.button
+                    className="edit"
+                    onClick={() => {
+                      setInput(entry.text);
+                      setCategory(entry.category);
+                      setEditIndex(index);
+                      if (inputRef.current) inputRef.current.focus();
+                    }}
+                  >
+                    ✏️
+                  </motion.button>
                 </>
               )}
             </motion.li>
@@ -174,5 +185,7 @@ export default function Home() {
         </AnimatePresence>
       </motion.ul>
     </div>
+    
   );
+  
 }

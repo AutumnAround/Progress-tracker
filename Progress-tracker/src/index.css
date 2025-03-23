@@ -415,3 +415,10 @@ motion.li:hover {
 .undo-button:hover {
   background: #008e75;
 }
+
+.edit-indicator {
+  margin: 10px 0;
+  color: #ff0;
+  font-weight: bold;
+  text-shadow: 0 0 5px #000;
+}

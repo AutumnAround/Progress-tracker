@@ -487,3 +487,53 @@ motion.li:hover {
 .clear-button button:hover {
   background-color: darkred;
 }
+
+.backup-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.backup-buttons button {
+  background-color: #444;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.backup-buttons button:hover {
+  background-color: #666;
+}
+
+.data-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.backup-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.backup-buttons button,
+.clear-button button {
+  background-color: #333;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.backup-buttons button:hover,
+.clear-button button:hover {
+  background-color: #555;
+}

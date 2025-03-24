@@ -12,6 +12,8 @@ export default function Home() {
   const [deletedIndex, setDeletedIndex] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [editedIndex, setEditedIndex] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     if (inputRef.current) {
@@ -25,6 +27,54 @@ export default function Home() {
       setEntries(JSON.parse(savedEntries));
     }
   }, []);
+
+  const exportData = () => {
+    const dataStr = JSON.stringify(entries, null, 2); // форматируем для читаемости
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+  
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "progress.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  <div className="backup-buttons">
+  <button onClick={exportData}>📤 Экспорт в JSON</button>
+  </div>
+
+const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const imported = JSON.parse(event.target?.result as string);
+      if (Array.isArray(imported)) {
+        setEntries(imported);
+        localStorage.setItem("progress", JSON.stringify(imported));
+        alert("Импорт выполнен успешно!");
+      } else {
+        alert("Файл не подходит. Ожидается массив записей.");
+      }
+    } catch {
+      alert("Ошибка при чтении файла.");
+    }
+  };
+  reader.readAsText(file);
+};
+
+<input
+  type="file"
+  accept=".json"
+  style={{ display: "none" }}
+  onChange={(e) => importData(e)}
+  ref={fileInputRef}
+/>
+
 
   const clearAllEntries = () => {
     const confirmClear = window.confirm("Ты точно хочешь удалить все записи? Это действие необратимо!");
@@ -153,9 +203,24 @@ export default function Home() {
         </select>
       </div>
 
-      <div className="clear-button">
-  <button onClick={clearAllEntries}>🗑️ Очистить всё</button>
-      </div>
+      <div className="data-controls">
+  <div className="clear-button">
+    <button onClick={clearAllEntries}>🗑️ Очистить всё</button>
+  </div>
+
+  <div className="backup-buttons">
+    <button onClick={exportData}>📤 Экспорт в JSON</button>
+    <button onClick={() => fileInputRef.current?.click()}>📥 Импорт из JSON</button>
+    <input
+      type="file"
+      accept=".json"
+      style={{ display: "none" }}
+      onChange={(e) => importData(e)}
+      ref={fileInputRef}
+    />
+  </div>
+</div>
+
 
 
       {deletedEntry && (

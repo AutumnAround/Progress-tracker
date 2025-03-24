@@ -152,15 +152,23 @@ export default function Home() {
               whileTap={{ scale: 0.95, transition: { duration: 0.1 } }}
               transition={{ duration: 0.3 }}
             >
-              {editIndex === index ? (
-                <input
-                  type="text"
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  onBlur={() => saveEdit(index)}
-                  autoFocus
-                />
-              ) : (
+                    {editIndex === index ? (
+                    <motion.input
+                      key="editInput"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveEdit(index);
+                      }}
+                    />
+                  ) : (
+                    <>
+                      <strong>[{entry.category}]</strong> {entry.text}
+                    </>
+                  )}
                 <>
                   {editIndex === index ? (
                 <input
@@ -175,12 +183,41 @@ export default function Home() {
                   <strong>[{entry.category}]</strong> {entry.text}
                 </>
               )}
-              {editIndex === index ? (
-                <button onClick={() => saveEdit(index)}>💾</button>
-              ) : (
-                <button onClick={() => startEdit(index, entry.text)}>✏️</button>
-              )}
-                  <motion.button className="delete" onClick={() => deleteEntry(index)}>❌</motion.button>
+                  {editIndex === index ? (
+                    <motion.button
+                      className="save"
+                      onClick={() => saveEdit(index)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      💾
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      className="edit"
+                      onClick={() => startEdit(index, entry.text)}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      ✏️
+                    </motion.button>
+                  )}
+
+                  <motion.button className="delete" onClick={() => deleteEntry(index)}>
+                  {editIndex === index && (
+                      <motion.button
+                        className="cancel"
+                        onClick={() => {
+                          setEditIndex(null);
+                          setEditText("");
+                        }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
+                        ❌
+                      </motion.button>
+                    )}
+                  </motion.button>
                   <motion.button
                     className="edit"
                     onClick={() => {
@@ -190,10 +227,8 @@ export default function Home() {
                       if (inputRef.current) inputRef.current.focus();
                     }}
                   >
-                    ✏️
                   </motion.button>
                 </>
-              )}
             </motion.li>
           ))}
         </AnimatePresence>

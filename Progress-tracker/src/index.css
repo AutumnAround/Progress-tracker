@@ -358,6 +358,24 @@ input:focus {
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
 }
 
+input[type="text"] {
+  padding: 6px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 300px;
+  margin-right: 8px;
+}
+
+button.edit, button.save, button.cancel {
+  margin-left: 8px;
+  padding: 4px 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
 button {
   background-color: #ff007f;  
   color: white;

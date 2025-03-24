@@ -50,6 +50,42 @@ body::before {
   z-index: -1; 
 }
 
+body.dark {
+  color: #eee;
+}
+
+body.light {
+  color: #222;
+}
+
+body {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.app-wrapper {
+  min-height: 100vh;
+  background-image: url("/main_background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: background 0.5s ease;
+}
+
+.app-wrapper.light {
+  backdrop-filter: brightness(1.2) contrast(0.95);
+  color: #111;
+}
+
+.app-wrapper.dark {
+  backdrop-filter: brightness(0.7) contrast(1.2);
+  color: #eee;
+}
+
+
+
 button {
   background: #00bfff;       
   color: white;             

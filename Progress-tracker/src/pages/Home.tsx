@@ -13,7 +13,15 @@ export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [editedIndex, setEditedIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "dark";
+  });
+  
+  useEffect(() => {
+    document.body.className = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+  
 
   useEffect(() => {
     if (inputRef.current) {
@@ -173,6 +181,12 @@ const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
       <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
         📌 Progress Tracker
       </motion.h1>
+      <div className="theme-toggle">
+      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+        💡 Переключить тему
+      </button>
+      </div>
+
       {editIndex !== null && (
           <div className="edit-indicator">
             ✏️ <strong>Редактирование записи #{editIndex + 1}</strong>

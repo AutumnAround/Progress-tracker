@@ -6,10 +6,8 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [category, setCategory] = useState("Общее");
   const [filter, setFilter] = useState("Все");
-
   const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editText, setEditText] = useState<string>("");
-
+  const [editText, setEditText] = useState("");
   const [deletedEntry, setDeletedEntry] = useState<{ text: string; category: string } | null>(null);
   const [deletedIndex, setDeletedIndex] = useState<number | null>(null);
 
@@ -164,8 +162,24 @@ export default function Home() {
                 />
               ) : (
                 <>
+                  {editIndex === index ? (
+                <input
+                  value={editText}
+                  onChange={(e) => setEditText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveEdit(index);
+                  }}
+                />
+              ) : (
+                <>
                   <strong>[{entry.category}]</strong> {entry.text}
-                  <motion.button className="edit" onClick={() => startEdit(index, entry.text)}>✏</motion.button>
+                </>
+              )}
+              {editIndex === index ? (
+                <button onClick={() => saveEdit(index)}>💾</button>
+              ) : (
+                <button onClick={() => startEdit(index, entry.text)}>✏️</button>
+              )}
                   <motion.button className="delete" onClick={() => deleteEntry(index)}>❌</motion.button>
                   <motion.button
                     className="edit"

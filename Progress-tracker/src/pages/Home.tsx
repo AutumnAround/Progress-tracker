@@ -26,6 +26,15 @@ export default function Home() {
     }
   }, []);
 
+  const clearAllEntries = () => {
+    const confirmClear = window.confirm("Ты точно хочешь удалить все записи? Это действие необратимо!");
+    if (!confirmClear) return;
+  
+    setEntries([]);
+    localStorage.removeItem("progress");
+  };
+  
+
   const addEntry = () => {
     if (input.trim() === "") return;
   
@@ -143,6 +152,11 @@ export default function Home() {
           <option>Личное ({categoryCounts["Личное"] || 0})</option>
         </select>
       </div>
+
+      <div className="clear-button">
+  <button onClick={clearAllEntries}>🗑️ Очистить всё</button>
+      </div>
+
 
       {deletedEntry && (
         <motion.div 

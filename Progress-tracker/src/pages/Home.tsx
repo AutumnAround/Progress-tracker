@@ -10,8 +10,8 @@ export default function Home() {
   const [editText, setEditText] = useState("");
   const [deletedEntry, setDeletedEntry] = useState<{ text: string; category: string } | null>(null);
   const [deletedIndex, setDeletedIndex] = useState<number | null>(null);
-
   const inputRef = useRef<HTMLInputElement>(null);
+  const [editedIndex, setEditedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -77,13 +77,18 @@ export default function Home() {
   };
 
   const saveEdit = (index: number) => {
-    if (editText.trim() === "") return;
     const updatedEntries = [...entries];
     updatedEntries[index].text = editText;
     setEntries(updatedEntries);
     localStorage.setItem("progress", JSON.stringify(updatedEntries));
     setEditIndex(null);
+    setEditText("");
+  
+    setEditedIndex(index); // показать ✅
+  
+    setTimeout(() => setEditedIndex(null), 2000); // скрыть через 2 сек
   };
+  
 
   const filteredEntries = filter === "Все" ? entries : entries.filter(entry => entry.category === filter);
 
@@ -91,6 +96,18 @@ export default function Home() {
     acc[entry.category] = (acc[entry.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+  
+  <div className="stats-section">
+    <h3>📈 Статистика</h3>
+    <ul>
+      {Object.entries(categoryCounts).map(([cat, count]) => (
+        <li key={cat}>
+          <strong>{cat}:</strong> {count} записей
+        </li>
+      ))}
+    </ul>
+  </div>
+
 
   return (
     <div className="container">
@@ -170,19 +187,19 @@ export default function Home() {
                     </>
                   )}
                 <>
-                  {editIndex === index ? (
-                <input
-                  value={editText}
-                  onChange={(e) => setEditText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveEdit(index);
-                  }}
-                />
-              ) : (
-                <>
-                  <strong>[{entry.category}]</strong> {entry.text}
-                </>
-              )}
+                {editedIndex === index && (
+                  <motion.span
+                    key="check"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="success-check"
+                  >
+                    ✅
+                  </motion.span>
+                )}
+
                   {editIndex === index ? (
                     <motion.button
                       className="save"
@@ -203,7 +220,7 @@ export default function Home() {
                     </motion.button>
                   )}
 
-                  <motion.button className="delete" onClick={() => deleteEntry(index)}>
+                  <motion.button className="delete" onClick={() => deleteEntry(index)}>❌
                   {editIndex === index && (
                       <motion.button
                         className="cancel"

@@ -440,3 +440,30 @@ motion.li:hover {
   font-weight: bold;
   text-shadow: 0 0 5px #000;
 }
+
+.success-check {
+  margin-left: 10px;
+  font-size: 18px;
+  color: limegreen;
+}
+
+.stats-section {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 20px;
+  color: #fff;
+  backdrop-filter: blur(4px);
+  max-width: 400px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.stats-section h3 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: #0ff;
+}
+.stats-section li {
+  list-style: none;
+  padding: 4px 0;
+}
